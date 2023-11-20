@@ -5,7 +5,7 @@ import numpy as np
 import csv
 from mpl_toolkits.mplot3d import Axes3D
 
-file_path = 'D:/Cybersoft/Mid Test/merc.csv'
+file_path = 'D:/Cybersoft/Germany-Used-Car-Analysis/Midterm/merc.csv'
 row_list = []
 with open(file_path, newline='', encoding='utf-8') as csv_file:
     data_csv = csv.reader(csv_file, delimiter=',', skipinitialspace=True, quotechar='"')
