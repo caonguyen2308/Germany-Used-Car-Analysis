@@ -22,9 +22,18 @@ percentage_value = mean_percentage_change * 100
 st.set_page_config(page_title="Germany Used Car Analysis Dashboard", page_icon="rocket", layout="wide")
 
 # Sidebar for selecting different plots
-selected_plot = st.sidebar.radio("Select Plot", ('Nguyen', 'Linh', 'Minh'))
 
-if selected_plot == 'Nguyen':
+selected_plot = st.sidebar.radio("Select Plot", ('CSV Dataset','Fuel Type and Predicting Prices', 'Linh', 'Minh'))
+
+if selected_plot == 'CSV Dataset':
+    datafile = st.sidebar.file_uploader("Upload dataset", ["csv"])
+    if datafile is None:
+        st.info("""My dataset (.csv) in the sidebar to get started.""")
+        st.stop()
+    else:
+        dataset = pd.read_csv('D:/Cybersoft/Germany-Used-Car-Analysis/brandcode_final.csv', encoding='ISO-8859-1')
+        st.write(dataset)
+elif selected_plot == 'Fuel Type and Predicting Prices':
     tab1, tab2 = st.tabs(["Fuel Type", "Predicting Prices"])
 
     with tab1:
@@ -146,7 +155,8 @@ elif selected_plot == 'Linh':
         plt.ylabel('Car Sales')
         plt.title('Car Sales by Brands')
         plt.xticks(rotation=55, ha='right')
-        # Display the chart
+        # Display the 
+        st.header ("Car Sales by Brand :car:")
         plt.show()
         st.pyplot(plt)
 
@@ -180,32 +190,10 @@ elif selected_plot == 'Linh':
         sns.set_palette("pastel")
         plt.grid(axis='y', linestyle='--', alpha=0.7)
 # Display the chart
-        plt.show()
+        st.header ("Car sales by brand and Average Prices")
         st.pyplot(fig)
 
     with tab5:
-        grouped_data = df3.groupby(['brand', 'model']).size().reset_index(name='count')
-        # Find the index of the most common model for each brand
-        idx_most_common = grouped_data.groupby('brand')['count'].idxmax()
-        most_common_models = grouped_data.loc[idx_most_common]
-        most_common_models = most_common_models.sort_values(by='count', ascending=False)
-        # Create a dropdown list with unique brand values and an "all" option
-        brand_options = ['all'] + most_common_models['brand'].unique().tolist()
-        selected_brand = st.selectbox('Select Brand:', brand_options)
-        # Function to filter data based on the selected brand
-        def filter_data(selected_brand):
-            if selected_brand == 'all':
-                result = most_common_models
-            else:
-                result = most_common_models[most_common_models['brand'] == selected_brand]
-            return result.rename(columns={'count': 'Car Sales'})
-        # Display the filtered result
-        #selected_brand = st.selectbox('Select Brand:', brand_options, key="brand_selectbox_unique_key")
-        result = filter_data(selected_brand)
-        st.write(result)
-        st.pyplot(fig)
-
-    with tab6:
         top_10_models_with_prices = df3.groupby('model')['price_in_euro'].agg(['count', 'mean']).reset_index()
         top_10_models_with_prices = top_10_models_with_prices.nlargest(10, 'count')
 
@@ -231,31 +219,46 @@ elif selected_plot == 'Linh':
         # Set labels and title for the line chart
         ax2.set_ylabel('Average Price', color='orange')
         ax2.grid(visible=False)
-        plt.show()
+        st.header ("Top 10 best-selling Car")
         st.pyplot(fig)
 
+    with tab6:
+        grouped_data = df3.groupby(['brand', 'model']).size().reset_index(name='count')
+        # Find the index of the most common model for each brand
+        idx_most_common = grouped_data.groupby('brand')['count'].idxmax()
+        most_common_models = grouped_data.loc[idx_most_common]
+        most_common_models = most_common_models.sort_values(by='count', ascending=False)
+        # Create a dropdown list with unique brand values and an "all" option
+        brand_options = ['all'] + most_common_models['brand'].unique().tolist()
+        selected_brand = st.selectbox('Select Brand:', brand_options)
+        # Function to filter data based on the selected brand
+        def filter_data(selected_brand):
+            if selected_brand == 'all':
+                result = most_common_models
+            else:
+                result = most_common_models[most_common_models['brand'] == selected_brand]
+            return result.rename(columns={'count': 'Car Sales'})
+        # Display the filtered result
+        result = filter_data(selected_brand)
+        st.header ("Top Selling Car")
+        st.write(result)
+        
+
     with tab7:
-#Biểu đồ về lượng xe theo năm đăng ký
-
-# Assuming df3 is your DataFrame and 'registration_date' is a column in it
-        df3['registration_date'] = pd.to_datetime(df3['registration_date'], format='%m/%d/%Y', errors='coerce')
-
-# Filter out rows with missing or invalid dates
-        df3 = df3.dropna(subset=['registration_date'])
-
-# Extract the year from the 'registration_date' column
+        df3['registration_date'] = pd.to_datetime(df3['registration_date'], format='%m/%d/%Y %H:%M', errors='coerce')
+        # Extract year from 'registration_date'
         df3['year'] = df3['registration_date'].dt.year
-
-# Count the number of registrations for each year
+        # Count the number of registrations for each year
         registrations_by_year = df3['year'].value_counts().sort_index()
-
-# Plot the count of registrations per year as a line graph
+        # Plot the count of registrations per year as a line chart
         plt.figure(figsize=(10, 6))
-        plt.plot(registrations_by_year.index, registrations_by_year.values, marker='o', linestyle='-', color='blue')
-        plt.title('Number of Registered Vehicles by Year')
+        plt.plot(registrations_by_year.index, registrations_by_year.values, marker='o', linestyle='-', color='b')
+        plt.title('Vehicle Registrations by Year')
         plt.xlabel('Year')
         plt.ylabel('Number of Registrations')
         plt.xticks(rotation=45)
+        plt.grid(True)
+        st.header ("Vehicle Registrations by Year")
         st.pyplot(plt)
 
 elif selected_plot == 'Minh':
