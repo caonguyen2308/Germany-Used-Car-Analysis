@@ -23,13 +23,12 @@ st.set_page_config(page_title="Germany Used Car Analysis Dashboard", page_icon="
 
 # Sidebar for selecting different plots
 
-selected_plot = st.sidebar.radio("Select Plot", ('CSV Dataset','Fuel Type and Predicting Prices', 'Linh', 'Minh'))
+selected_plot = st.sidebar.radio("Select Plot", ('CSV Dataset','Fuel Type and Predicting Prices', 'Popular Brand Models', 'Consumption'))
 
 if selected_plot == 'CSV Dataset':
     datafile = st.sidebar.file_uploader("Upload dataset", ["csv"])
     if datafile is None:
         st.info("""My dataset (.csv) in the sidebar to get started.""")
-        st.stop()
     else:
         dataset = pd.read_csv('D:/Cybersoft/Germany-Used-Car-Analysis/brandcode_final.csv', encoding='ISO-8859-1')
         st.write(dataset)
@@ -140,7 +139,7 @@ elif selected_plot == 'Fuel Type and Predicting Prices':
             plt.grid(True)
             col_bottom[0].pyplot(plt)
 
-elif selected_plot == 'Linh':
+elif selected_plot == 'Popular Brand Models':
     fig, ax1 = plt.subplots(figsize=(20, 8))
     ax2 = ax1.twinx()
     tab3, tab4, tab5, tab6, tab7 = st.tabs(["Car Sales By Brand", "Car Sales By Brand And Average Prices", "Top 10 Best Selling", "Top List Car Best-Seller", "Registered Over Years"])
@@ -165,11 +164,9 @@ elif selected_plot == 'Linh':
         brand_stats = brand_stats.sort_values(by='count', ascending=False)
         fig, ax1 = plt.subplots(figsize=(20, 8))
 
-# Plot count on the primary y-axis (bar chart)
+            # Plot count on the primary y-axis (bar chart)
         x_positions = range(len(brand_stats))
         ax1.bar(x_positions, brand_stats['count'], color='skyblue', width=0.8, label='Unit')
-
-        ax2 = ax1.twinx()
         ax2.plot(x_positions, brand_stats['mean'], marker='o', color='green', label='Average Price')
         plt.style.use('default')
         ax1.set_xlabel('Car Brands')
@@ -180,16 +177,16 @@ elif selected_plot == 'Linh':
         ax1.grid(False)
         ax2.grid(False)
 
-# Show legend
+        # Show legend
         ax1.legend(loc='upper left', bbox_to_anchor=(0.85, 0.90))
         ax2.legend(loc='upper left', bbox_to_anchor=(0.85, 0.95))
 
-# Set x-axis ticks and labels
+        # Set x-axis ticks and labels
         ax1.set_xticks(x_positions)
         ax1.set_xticklabels(brand_stats.index, rotation=55, ha='right')
         sns.set_palette("pastel")
         plt.grid(axis='y', linestyle='--', alpha=0.7)
-# Display the chart
+        # Display the chart
         st.header ("Car sales by brand and Average Prices")
         st.pyplot(fig)
 
@@ -261,9 +258,88 @@ elif selected_plot == 'Linh':
         st.header ("Vehicle Registrations by Year")
         st.pyplot(plt)
 
-elif selected_plot == 'Minh':
-    st.header("Content for Minh")
+elif selected_plot == 'Consumption':
+    tab8, tab9 = st.tabs(["Fuel Consumption of Brands", "Electric Consumption of Brands"])
+    with tab8:
+        st.header("Mean Fuel Consumption per 100km Comparison of Brands")
+        fig8, axes8 = plt.subplots(nrows=2, ncols=2, figsize=(12, 8), sharex=True)
+        cdata_normal_fuel = df3.loc[df3['fuel_type'] !='Electric'].copy()
+        mean_fuel = cdata_normal_fuel.groupby(['brand'])['fuel_consumption_l_100km'].mean().reset_index()
+        mean_fuel.sort_values('fuel_consumption_l_100km',ascending=False,inplace=True)
+        sns.barplot(data=mean_fuel.head(10), x='fuel_consumption_l_100km', y='brand', palette='viridis', ax=axes8[0, 0])
+        axes8[0, 0].set_title('Top 1-10 Brands')
+        axes8[0, 0].set_xlabel('Fuel Consumption (l/100km)')
+        axes8[0, 0].set_ylabel('Brand Name')
+        axes8[0, 0].grid(axis='x')
 
+
+        sns.barplot(data=mean_fuel.iloc[10:20], x='fuel_consumption_l_100km', y='brand', palette='rocket', ax=axes8[0, 1])
+        axes8[0, 1].set_title('Top 11-20 Brands')
+        axes8[0, 1].set_xlabel('Fuel Consumption (l/100km)')
+        axes8[0, 1].set_ylabel('Brand Name')
+        axes8[0, 1].grid(axis='x')
+
+
+        sns.barplot(data=mean_fuel.iloc[20:30], x='fuel_consumption_l_100km', y='brand', palette='mako', ax=axes8[1, 0])
+        axes8[1, 0].set_title('Top 21-30 Brands')
+        axes8[1, 0].set_xlabel('Fuel Consumption (l/100km)')
+        axes8[1, 0].set_ylabel('Brand Name')
+        axes8[1, 0].grid(axis='x')
+
+
+        sns.barplot(data=mean_fuel.iloc[30:], x='fuel_consumption_l_100km', y='brand', palette='magma', ax=axes8[1, 1])
+        axes8[1, 1].set_title('Top 31-45 Brands')
+        axes8[1, 1].set_xlabel('Fuel Consumption (l/100km)')
+        axes8[1, 1].set_ylabel('Brand Name')
+        axes8[1, 1].grid(axis='x')
+
+
+        fig8.suptitle('Mean Fuel Consumption per 100km Comparison of Brands', fontweight='bold', fontsize=16)
+
+        plt.tight_layout(pad=1.0)
+        fig8.patch.set_facecolor('#d3f0ff')
+        plt.savefig('Normal_Fuel_consumption', bbox_inches='tight')
+        st.pyplot(fig8)
+    with tab9:
+        st.header("Mean Electric Consumption per 100km Comparison of Brands")
+        fig9, axes9 = plt.subplots(nrows=2, ncols=2, figsize=(11, 7), sharex=True)
+        cdata_electric = df3.loc[df3['fuel_type'] == 'Electric'].copy()
+        cdata_electric.reset_index(drop=True)
+        cdata_electric.rename(columns={'fuel_consumption_l_100km':'charge_time_100km'},inplace=True)
+        cdata_electric.reset_index(drop=True,inplace=True)
+        mean_charge = cdata_electric.groupby(['brand'])['charge_time_100km'].mean().reset_index()
+        mean_charge.sort_values('charge_time_100km',ascending=False,inplace=True)
+        mean_charge.reset_index(drop=True,inplace=True)
+        sns.barplot(data=mean_charge.head(7), x='charge_time_100km', y='brand', palette='viridis', ax=axes9[0, 0])
+        axes9[0, 0].set_title('Top 1-7 Brands')
+        axes9[0, 0].set_xlabel('Electric Consumption (charge/100km)')
+        axes9[0, 0].set_ylabel('Brand Name')
+        axes9[0, 0].grid(axis='x')
+
+
+        sns.barplot(data=mean_charge.iloc[7:14], x='charge_time_100km', y='brand', palette='rocket', ax=axes9[0, 1])
+        axes9[0, 1].set_title('Top 8-14 Brands')
+        axes9[0, 1].set_xlabel('Eletric Consumption (charges/100km)')
+        axes9[0, 1].set_ylabel('Brand Name')
+        axes9[0, 1].grid(axis='x')
+
+        sns.barplot(data=mean_charge.iloc[14:21], x='charge_time_100km', y='brand', palette='mako', ax=axes9[1, 0])
+        axes9[1, 0].set_title('Top 15-21 Brands')
+        axes9[1, 0].set_xlabel('Electric Consumption (charges/100km)')
+        axes9[1, 0].set_ylabel('Brand Name')
+        axes9[1, 0].grid(axis='x')
+
+        sns.barplot(data=mean_charge.iloc[21:], x='charge_time_100km', y='brand', palette='magma', ax=axes9[1, 1])
+        axes9[1, 1].set_title('Top 22-27 Brands')
+        axes9[1, 1].set_xlabel('Eletric Consumption (charges/100km)')
+        axes9[1, 1].set_ylabel('Brand Name')
+        axes9[1, 1].grid(axis='x')
+
+        fig9.suptitle('Mean Electric Consumption per 100km Comparison of Brands', fontweight='bold', fontsize=16,color='yellow')
+        plt.tight_layout(pad=2.0)
+        fig9.patch.set_facecolor('#87CEEB')
+        plt.savefig('Electric_consumption', bbox_inches='tight')
+        st.pyplot(fig9)
 
 # To run streamlit in websit local host: Please run the code and it will return the link for you
 # Then, copy it and run it in the terminal
