@@ -162,9 +162,10 @@ elif selected_plot == 'Popular Brand Models':
     with tab4:
         brand_stats = df3.groupby('brand')['price_in_euro'].agg(['count', 'mean'])
         brand_stats = brand_stats.sort_values(by='count', ascending=False)
-        fig, ax1 = plt.subplots(figsize=(20, 8))
-
-            # Plot count on the primary y-axis (bar chart)
+        brand_stats = df3.groupby('brand')['price_in_euro'].agg(['count', 'mean'])
+        brand_stats = brand_stats.sort_values(by='count', ascending=False)
+        ax2 = ax1.twinx()
+        # Plot count on the primary y-axis (bar chart)
         x_positions = range(len(brand_stats))
         ax1.bar(x_positions, brand_stats['count'], color='skyblue', width=0.8, label='Unit')
         ax2.plot(x_positions, brand_stats['mean'], marker='o', color='green', label='Average Price')
@@ -177,11 +178,11 @@ elif selected_plot == 'Popular Brand Models':
         ax1.grid(False)
         ax2.grid(False)
 
-        # Show legend
+                # Show legend
         ax1.legend(loc='upper left', bbox_to_anchor=(0.85, 0.90))
         ax2.legend(loc='upper left', bbox_to_anchor=(0.85, 0.95))
 
-        # Set x-axis ticks and labels
+                # Set x-axis ticks and labels
         ax1.set_xticks(x_positions)
         ax1.set_xticklabels(brand_stats.index, rotation=55, ha='right')
         sns.set_palette("pastel")
