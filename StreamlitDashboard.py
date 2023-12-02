@@ -131,7 +131,6 @@ elif selected_plot == 'Fuel Type and Predicting Prices':
             plt.scatter(average_prices['year'], average_prices['price_in_euro'], color='blue', label='Historical Data')
             plt.scatter(future_years['year'], predicted_prices, color='red', label='Predicted Prices')
             plt.plot(X, model.predict(X), color='green', label='Regression Line')
-
             plt.xlabel('Year')
             plt.ylabel('Price in Euro')
             plt.title('Predicting Prices')
@@ -140,8 +139,6 @@ elif selected_plot == 'Fuel Type and Predicting Prices':
             col_bottom[0].pyplot(plt)
 
 elif selected_plot == 'Popular Brand Models':
-    fig, ax1 = plt.subplots(figsize=(20, 8))
-    ax2 = ax1.twinx()
     tab3, tab4, tab5, tab6, tab7 = st.tabs(["Car Sales By Brand", "Car Sales By Brand And Average Prices", "Top 10 Best Selling", "Top List Car Best-Seller", "Registered Over Years"])
     with tab3:
         brand_counts = df3['brand'].value_counts()
@@ -156,33 +153,34 @@ elif selected_plot == 'Popular Brand Models':
         plt.xticks(rotation=55, ha='right')
         # Display the 
         st.header ("Car Sales by Brand :car:")
-        plt.show()
         st.pyplot(plt)
 
     with tab4:
         brand_stats = df3.groupby('brand')['price_in_euro'].agg(['count', 'mean'])
+        # Sort the DataFrame by count in descending order
         brand_stats = brand_stats.sort_values(by='count', ascending=False)
-        brand_stats = df3.groupby('brand')['price_in_euro'].agg(['count', 'mean'])
-        brand_stats = brand_stats.sort_values(by='count', ascending=False)
-        ax2 = ax1.twinx()
+        # Set the size of the chart
+        fig, ax1 = plt.subplots(figsize=(20, 8))
         # Plot count on the primary y-axis (bar chart)
         x_positions = range(len(brand_stats))
         ax1.bar(x_positions, brand_stats['count'], color='skyblue', width=0.8, label='Unit')
+        # Create a twin Axes sharing the x-axis
+        ax2 = ax1.twinx()
+        # Plot average price on the secondary y-axis (line chart)
         ax2.plot(x_positions, brand_stats['mean'], marker='o', color='green', label='Average Price')
-        plt.style.use('default')
+        # Set labels and title
         ax1.set_xlabel('Car Brands')
         ax1.set_ylabel('Car Sales')
         ax2.set_ylabel('Average Price')
         plt.title('Car sales by brand and Average Prices')
-
+        #set style
+        plt.style.use('default')
         ax1.grid(False)
         ax2.grid(False)
-
-                # Show legend
+        # Show legend
         ax1.legend(loc='upper left', bbox_to_anchor=(0.85, 0.90))
         ax2.legend(loc='upper left', bbox_to_anchor=(0.85, 0.95))
-
-                # Set x-axis ticks and labels
+        # Set x-axis ticks and labels
         ax1.set_xticks(x_positions)
         ax1.set_xticklabels(brand_stats.index, rotation=55, ha='right')
         sns.set_palette("pastel")
@@ -339,7 +337,6 @@ elif selected_plot == 'Consumption':
         fig9.suptitle('Mean Electric Consumption per 100km Comparison of Brands', fontweight='bold', fontsize=16,color='yellow')
         plt.tight_layout(pad=2.0)
         fig9.patch.set_facecolor('#87CEEB')
-        plt.savefig('Electric_consumption', bbox_inches='tight')
         st.pyplot(fig9)
 
 # To run streamlit in websit local host: Please run the code and it will return the link for you

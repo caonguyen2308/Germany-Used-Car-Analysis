@@ -16,8 +16,9 @@ with warnings.catch_warnings():
 
     # Convert 'registration_date' to DateTime format
     df['registration_date'] = pd.to_datetime(df['registration_date'], errors='coerce')
-    df['registration_date'] = df['registration_date'].dt.strftime('%Y-%m-%d')
-
+    df['registration_date'] = pd.to_datetime(df['registration_date'], format='%m/%d/%Y%H:%M', errors='coerce')
+    df['year'] = df['registration_date'].dt.year
+    
     # Delete duplicates
     df = df.drop_duplicates()
 
@@ -50,7 +51,9 @@ with warnings.catch_warnings():
     # Fill NaN values by the mean of respective columns
     df['fuel_consumption_g_km'].fillna(df['fuel_consumption_g_km'].mean(), inplace=True)
     df['fuel_consumption_l_100km'].fillna(df['fuel_consumption_l_100km'].mean(), inplace=True)
-
+    df = df[df['fuel_consumption_l_100km'] <= 20]
+   
+    
     # Fill NaN values for other columns
     df['price_in_euro'] = pd.to_numeric(df['price_in_euro'], errors='coerce')
     df['price_in_euro'].fillna(df['price_in_euro'].mean(), inplace=True)
@@ -87,6 +90,7 @@ with warnings.catch_warnings():
     # Save cleaned DataFrame to a new CSV file
     df.to_csv('D:/Cybersoft/Germany-Used-Car-Analysis/brandcode_final.csv', index=True)
     print('File replaced successfully!')
+    #df.info()
 
 
 
