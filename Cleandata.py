@@ -85,10 +85,6 @@ non_fuel_type_count = df[~df['fuel_type'].isin(valid_fuel_types)].shape[0]
 df = df[df['fuel_type'].isin(valid_fuel_types)]
 df.reset_index(drop=True, inplace=True)
 df_electric = df[df['fuel_type'] == 'Electric']
-cdata_electric = df.loc[df['fuel_type'] == 'Electric'].copy()
-cdata_electric.rename(columns={'fuel_consumption_l_100km':'charge_time_100km'},inplace=True)
-cdata_electric.reset_index(drop=True,inplace=True)
-cdata_normal_fuel = df.loc[df['fuel_type'] != 'Electric'].copy()
 
 df.drop('offer_description', axis=1, inplace=True)
 # Save cleaned DataFrame to a new CSV file

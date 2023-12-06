@@ -10,8 +10,9 @@ import numpy as np
 
 # Reading data
 
-df = pd.read_csv('D:/Cybersoft/Germany-Used-Car-Analysis/brandcode_final.csv', encoding='ISO-8859-1')
-df3 = cdata = pd.read_csv('D:/Cybersoft/Germany-Used-Car-Analysis/brandcode_final.csv', encoding='utf-8')
+df = pd.read_csv('D:/Cybersoft/Germany-Used-Car-Analysis/final.csv', encoding='ISO-8859-1')
+df3 = cdata = g_data = pd.read_csv('D:/Cybersoft/Germany-Used-Car-Analysis/final.csv', encoding='utf-8')
+
 # Ignoring warnings
 with warnings.catch_warnings():
     warnings.simplefilter("ignore")
@@ -29,7 +30,7 @@ st.set_page_config(page_title="Germany Used Car Analysis Dashboard", page_icon="
 
 # Sidebar for selecting different plots
 
-selected_plot = st.sidebar.radio("Select Plot", ('CSV Dataset', 'Popular Brand Models', 'Consumption','Fuel Type and Predicting Prices'))
+selected_plot = st.sidebar.radio("Select Plot", ('CSV Dataset', 'Popular Brand Models', 'Consumption','Analyze Prices'))
 
 if selected_plot == 'CSV Dataset':
     datafile = st.sidebar.file_uploader("Upload dataset", ["csv"])
@@ -40,7 +41,7 @@ if selected_plot == 'CSV Dataset':
         st.write(dataset)
 
 elif selected_plot == 'Popular Brand Models':
-    tab1, tab2, tab3, tab4 = st.tabs(["Car Sales By Brand", "Car Sales By Brand And Average Prices", "Top 10 Best Selling", "Top List Car Best-Seller"])
+    tab1, tab2, tab3, tab4, tab5 = st.tabs(["Car Sales By Brand", "Car Sales By Brand And Average Prices", "Top 10 Best Selling", "Top List Car Best-Seller", "Registration Car"])
     with tab1:
         brand_counts = df3['brand'].value_counts()
         # Set the size of the chart
@@ -139,11 +140,24 @@ elif selected_plot == 'Popular Brand Models':
         result = filter_data(selected_brand)
         st.header ("Top Selling Car")
         st.write(result)
+
+    with tab5:
+        # Count the number of registrations for each year
+        registrations_by_year = df3['year'].value_counts().sort_index()
+        # Plot the count of registrations per year as a line chart
+        plt.figure(figsize=(10, 6))
+        plt.plot(registrations_by_year.index, registrations_by_year.values, marker='o', linestyle='-', color='b')
+        plt.title('Vehicle Registrations by Year')
+        plt.xlabel('Year')
+        plt.ylabel('Number of Registrations')
+        plt.xticks(rotation=45)
+        plt.grid(True)
+        st.pyplot(plt)
         
 
 elif selected_plot == 'Consumption':
-    tab5, tab6, tab7, tab8, tab9 = st.tabs(["Fuel Types", "Consumption by fuel type", "Fuel Consumption l/100km ", "PowerPS by Fuel Type", "Information of Fuel Consumption"])
-    with tab5:
+    tab6, tab7, tab8, tab9, tab10, tab11, tab12 = st.tabs(["Fuel Types", "Consumption by fuel type", "Fuel Consumption l/100km ", "PowerPS by Fuel Type", "Information of Fuel Consumption", "Emission By Brand", "Emission with Fuel Consumption"])
+    with tab6:
         st.header("_Fuel Type_ :bar_chart:")
         columns = st.columns(2)
         top = columns[0]
@@ -180,7 +194,7 @@ elif selected_plot == 'Consumption':
         # Display the plots separately in their respective sections
         st.pyplot(fig_top)
         st.pyplot(fig_bottom)
-    with tab6:
+    with tab7:
         st.header("Consumption by Fuel Type")
         col3, col4 = st.columns([2, 2])  # Divide the layout into two columns
         with col3:
@@ -216,12 +230,11 @@ elif selected_plot == 'Consumption':
             axes8[1, 1].set_ylabel('Brand Name')
             axes8[1, 1].grid(axis='x')
 
-
             fig8.suptitle('Mean Fuel Consumption per 100km Comparison of Brands', fontweight='bold', fontsize=16)
-
             plt.tight_layout(pad=1.0)
             fig8.patch.set_facecolor('#d3f0ff')
             st.pyplot(fig8)
+
         with col4:
             st.subheader("Electric Consumption")
             fig9, axes9 = plt.subplots(nrows=2, ncols=2, figsize=(11, 7), sharex=True)
@@ -262,11 +275,11 @@ elif selected_plot == 'Consumption':
             fig9.patch.set_facecolor('#87CEEB')
             st.pyplot(fig9)
 
-    with tab7:
+    with tab8:
             fuelt_fuelc = cdata_normal_fuel.groupby('fuel_type')['fuel_consumption_l_100km'].mean().reset_index()
             fig10, ax10 = plt.subplots(figsize=(11, 7))
 
-            sns.barplot(data=fuelt_fuelc, x='fuel_type', y='fuel_consumption_l_100km', ax=ax10)
+            sns.barplot(data=fuelt_fuelc, x='fuel_type', y='fuel_consumption_l_100km', ax=ax10, palette= 'tab10')
 
             for p in ax10.patches:
                 ax10.annotate(f'{p.get_height():.2f}', (p.get_x() + p.get_width() / 2., p.get_height()),
@@ -279,12 +292,11 @@ elif selected_plot == 'Consumption':
             st.header("Mean fuel consumption of each fuel type L/100Km")
             st.pyplot(fig10)
 
-    with tab8:
+    with tab9:
         st.header("Power PS")
         col7, col8 = st.columns([2, 2])
         with col7:
             st.subheader("Power PS Fuel")
-            cdata = pd.read_csv('D:/Cybersoft/Germany-Used-Car-Analysis/brandcode_final.csv', encoding='utf-8')
             cdata_electric = cdata.loc[cdata['fuel_type'] == 'Electric'].copy()
             cdata_electric.rename(columns={'fuel_consumption_l_100km':'charge_time_100km'},inplace=True)
             cdata_electric.reset_index(drop=True,inplace=True)
@@ -311,8 +323,8 @@ elif selected_plot == 'Consumption':
 
             xx = np.array([50, 700])
             yy = xx * (aa / 100) + bb
-            plt.figure(figsize=(8, 6))
 
+            plt.figure(figsize=(8, 6))
             sns.scatterplot(data=df3.sample(frac=0.3), x='power_ps', y='fuel_consumption_l_100km')
             plt.title('Scatter Plot of Power (PS) vs. Fuel Consumption (l/100km)')
             plt.xlabel('Power (PS)')
@@ -320,57 +332,142 @@ elif selected_plot == 'Consumption':
 
             if show_line:
                 xx_line = np.array([50, 700])
-                yy_line = xx_line * (0.02 / 100) + 2.5
+                yy_line = xx_line * (aa / 100) + bb
 
-                sns.scatterplot(data=df3.sample(frac=0.3), x='power_ps', y='fuel_consumption_l_100km')
-                plt.title('Scatter Plot of Power (PS) vs. Fuel Consumption (l/100km)\nLinear Regression: 0.02*x + 2.5')
-                plt.xlabel('Power (PS)')
-                plt.ylabel('Fuel Consumption (l/100km)')
-
-                sns.lineplot(x=xx_line, y=yy_line, color='red')
+                sns.lineplot(x=xx_line, y=yy_line, color='red', label=f'Linear Regression: {aa/100}*x + {bb}')
+                plt.legend()
 
             st.pyplot(plt)
-    with tab9:
-        st.header("General Information of Fuel Consumption")
+    with tab10:
+        st.header("Information of Fuel Consumption")
         col5, col6 = st.columns([2, 2])
         with col5:
             st.subheader("Electric")
             cdata_electric = df3.loc[df3['fuel_type'] == 'Electric'].copy()
-            cdata_electric.rename(columns={'fuel_consumption_l_100km': 'charge_time_100km'}, inplace=True)
-            cdata_electric.reset_index(drop=True, inplace=True)
-            fig5, ax5 = plt.subplots(figsize=(10, 7))
-            ax5.hist(cdata_electric['charge_time_100km'], bins=100, color='y', edgecolor='black')
-            ax5.axvline(344.555, color='blue', linestyle=':', linewidth=2)
-            ax5.text(344.555 + 10, 180, f"Mean:\n{344.555:.2f}", color="b")
-            ax5.axvline(344, color='green', linestyle='--', linewidth=2)
-            ax5.text(344 - 60, 170, f"Median:\n{344:.2f}", color='green')
-            ax5.axvline(201, color='violet', linestyle='--', linewidth=2)
-            ax5.text(201 - 60, 170, f"Mode:\n{201:0.2f}", color='violet')
+            cdata_electric.rename(columns={'fuel_consumption_l_100km':'charge_time_100km'},inplace=True)
+            cdata_electric.reset_index(drop=True,inplace=True)
+            cdata_normal_fuel = df3.loc[df3['fuel_type'] != 'Electric'].copy()
+            fig5, ax5 =plt.subplots(figsize=(10,7),num=1)
+            ax5.hist(cdata_electric['charge_time_100km'], bins = 10, color='y',edgecolor='black')
+            ax5.axvline(344.555, color='blue',linestyle=':',linewidth=2)
+            ax5.text(344.555 +10, 180, f"Mean:\n{344.555:.2f}", color="b")
+            ax5.axvline(344,color='green', linestyle='--',linewidth=2)
+            ax5.text(344-60,170 ,f"Median:\n{344:.2f}",color='green')
+            ax5.axvline(201, color='violet',linestyle='--',linewidth=2)
+            ax5.text(201-60,170,f"Mode:\n{201:0.2f}",color='violet')
             ax5.set_xlabel("Electric consumption (kW/100km)")
             plt.grid()
             st.pyplot(fig5)
 
         with col6:
             st.subheader("Fuel")
-            cdata_normal_fuel = df3.loc[df3['fuel_type'] != 'Electric'].copy()
-            fig6, ax6 = plt.subplots(figsize=(10, 7))
-            ax6.hist(cdata_normal_fuel['fuel_consumption_l_100km'], bins=100, color='r', edgecolor='black')
-            ax6.axvline(6.055, color='blue', linestyle=':', linewidth=2)
-            ax6.text(6.055 + 0.2, 13000, f"Mean:\n{6.055:.2f}", color="b")
-            ax6.axvline(5.7, color='green', linestyle='--', linewidth=2)
-            ax6.text(5.7 - 2.5, 13000, f"Median:\n{5.7:.2f}", color='green')
-            ax6.axvline(5.25, color='violet', linestyle='--', linewidth=2)
-            ax6.text(5.35 - 4, 13000, f"Mode:\n{5.25:0.2f}", color='violet')
-            ax6.set_xlabel("Fuel consumption (liter/100km)")
+            cdata_normal_fuel = cdata.loc[cdata['fuel_type'] != 'Electric'].copy()
+            fig6, ax6 =plt.subplots(figsize=(10,7),num=1)
+            ax6.hist(cdata_normal_fuel['fuel_consumption_l_100km'], bins = 100, color='r',edgecolor='black')
+            ax6.axvline(6.055, color='blue',linestyle=':',linewidth=2)
+            ax6.text(6.055+0.2, 13000, f"Mean:\n{6.055:.2f}", color="b")
+            ax6.axvline(5.7,color='green', linestyle='--',linewidth=2)
+            ax6.text(5.7-2.5,13000 ,f"Median:\n{5.7:.2f}",color='green')
+            ax6.axvline(5.25, color='violet',linestyle='--',linewidth=2)
+            ax6.text(5.35-4,13000,f"Mode:\n{5.25:0.2f}",color='violet')
+            ax6.set_xlabel("Fuel consumption (litter/100km)")
+            plt.title("General information of Fuel Consumption",fontweight='bold')
+            plt.grid()
             st.pyplot(fig6)
-elif selected_plot == 'Fuel Type and Predicting Prices':
+            
+    with tab11:
+        cdata_electric = cdata.loc[cdata['fuel_type'] == 'Electric'].copy()
+        cdata_electric.rename(columns={'fuel_consumption_l_100km':'charge_time_100km'},inplace=True)
+        cdata_electric.reset_index(drop=True,inplace=True)
+        cdata_normal_fuel = cdata.loc[cdata['fuel_type'] != 'Electric'].copy()
+        g_data_fuel = g_data[g_data['fuel_type']!="Electric"]
+        g_data_fuel.reset_index(drop=True,inplace=True)
+
+        mean_g = g_data_fuel.groupby('brand')['fuel_consumption_g_km'].mean().reset_index()
+        mean_g.sort_values('fuel_consumption_g_km',ascending=False,inplace=True)
+        mean_g.reset_index(drop=True,inplace=True)
+        fig11, axes11 = plt.subplots(nrows=2,ncols=2,figsize=(12,9),sharex=True)
+
+        sns.barplot(data=mean_g.head(10),  x='fuel_consumption_g_km',y='brand', palette='viridis',
+                ax=axes11[0,0])
+        axes11[0,0].set_title('top 10 Brands')
+        axes11[0,0].set_xlabel("Mean Emission (g/km)")
+        axes11[0,0].set_ylabel('Brand Name')
+        axes11[0,0].grid(axis='x')
+
+        sns.barplot(data=mean_g.loc[10:20],x='fuel_consumption_g_km',y='brand', palette='rocket',
+                ax=axes11[0,1])
+        axes11[0,1].set_title('top 11-20 Brands')
+        axes11[0,1].set_xlabel("Mean Emission (g/km)")
+        axes11[0,1].set_ylabel('Brand Name')
+        axes11[0,1].grid(axis='x')
+
+        sns.barplot(data=mean_g.loc[20:30],x='fuel_consumption_g_km', y='brand', palette='mako',
+                ax=axes11[1,0])
+        axes11[1,0].set_title('top 21-30 Brands')
+        axes11[1,0].set_xlabel("Mean Emission (g/km)")
+        axes11[1,0].set_ylabel('Brand Name')
+        axes11[1,0].grid(axis='x')
+
+        sns.barplot(data=mean_g.loc[30:],x='fuel_consumption_g_km', y='brand', palette='plasma',
+                ax=axes11[1,1])
+        axes11[1,1].set_title('top 31-45 Brands')
+        axes11[1,1].set_xlabel("Mean Emission (g/km)")
+        axes11[1,1].set_ylabel('Brand Name')
+        axes11[1,1].grid(axis='x')
+
+        fig11.suptitle('The Mean Emission Comparision of Normal Fuel Cars of Brands ',
+                    fontweight='bold', fontsize=16)
+
+        plt.tight_layout(pad=2.0)
+        fig11.patch.set_facecolor('#e6ccb3')
+        st.pyplot(fig11)
+    with tab12:
+        st.header("The emssion following by Fuel Consumption")
+        g_data_normal_fuel = g_data[g_data['fuel_type'] != "Electric"]
+        plt.figure(figsize=(8, 6))
+        sns.scatterplot(data=g_data_normal_fuel, x='fuel_consumption_l_100km', y='fuel_consumption_g_km', color='orange')
+        plt.title('Scatter Plot of Fuel Consumption (l/100km) vs. Emission (g/km)')
+        plt.xlabel('Fuel Consumption (l/100km)')
+        plt.ylabel('Emission (g/km)')
+        st.pyplot(plt)
+elif selected_plot == 'Analyze Prices': 
+    st.header("Prices")
+    tab13, tab14 = st.tabs(["Analyze Prices by Brand", "Predicting Prices"])
+    with tab13:
+        st.subheader("Analyze Prices by Brands")
+        cdata_normal_fuel = cdata[cdata['fuel_type']!='electric']
+        cdata_normal_fuel['price_in_euro'].describe()
+        cdata_normal_fuel['fuel_consumption_l_100km'].describe()
+
+        mean_price_brand = cdata_normal_fuel.groupby('brand')['price_in_euro'].mean().reset_index()
+        mean_price_brand.sort_values('price_in_euro',ascending=False,inplace=True)
+        mean_price_brand.reset_index(drop=True,inplace=True)
+        fig10, axes10 = plt.subplots(nrows=2, ncols=1, figsize=(7, 5), sharex=True)
+
+        sns.barplot(data=mean_price_brand.head(10), x='price_in_euro', y='brand', palette='viridis', ax=axes10[0])
+        axes10[0].set_title('Top 1-10 Brands')
+        axes10[0].set_xlabel('Price')
+        axes10[0].set_ylabel('Brand Name')
+        axes10[0].grid(axis='x')
+
+        sns.barplot(data=mean_price_brand.iloc[10:20], x='price_in_euro', y='brand', palette='mako', ax=axes10[1])
+        axes10[1].set_title('Top 11-20 Brands')
+        axes10[1].set_xlabel('Price')
+        axes10[1].set_ylabel('Brand Name')
+        axes10[1].grid(axis='x')
+        fig10.suptitle('top 20 brands price comparision', fontweight='bold', fontsize=16)
+        plt.tight_layout(pad=1.0)
+        fig10.patch.set_facecolor('#e6e6e6')
+        st.pyplot(fig10)
+    with tab14:
+        st.subheader("Predicting Prices Using Linear Regression")
         col1, col2 = st.columns([2, 2])  # Divide the layout into two columns
         col_bottom = st.columns([1])     # Single column at the bottom
         with col1:
             st.header("Percentage Over Years:")
             def plot_metric(label, value, prefix="", suffix="", show_graph=False, color_graph=""):
                 fig = go.Figure()
-
                 fig.add_trace(
                     go.Indicator(
                         value=value,
@@ -412,7 +509,7 @@ elif selected_plot == 'Fuel Type and Predicting Prices':
 
                 st.plotly_chart(fig, use_container_width=True)
             plot_metric("Percentage Change Over Years", percentage_value, suffix=" %", show_graph=True, color_graph="rgba(0, 104, 201, 0.2)")
-            
+                
 
         with col2:
             fig, ax = plt.subplots()
@@ -423,7 +520,7 @@ elif selected_plot == 'Fuel Type and Predicting Prices':
             st.pyplot(fig)
 
 
-        #with col_bottom:
+            #with col_bottom:
             col_bottom[0].header("Predicting Data in next 5 years:")    
             X = df[['year']]  
             y = df['price_in_euro']  
