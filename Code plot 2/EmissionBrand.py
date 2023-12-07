@@ -3,7 +3,7 @@ import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
 
-cdata = pd.read_csv('D:/Cybersoft/Germany-Used-Car-Analysis/Germany_Used_Cars.csv', encoding='utf-8')
+cdata = pd.read_csv('D:/Cybersoft/Germany-Used-Car-Analysis/final.csv', encoding='utf-8')
 
 g_data_fuel = cdata[cdata['fuel_type']!="Electric"]
 g_data_fuel.reset_index(drop=True,inplace=True)

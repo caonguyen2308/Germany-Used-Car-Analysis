@@ -4,7 +4,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 
 
-df3 = pd.read_csv('D:/Cybersoft/Germany-Used-Car-Analysis/brandcode_final.csv', encoding='utf-8')  
+df3 = pd.read_csv('D:/Cybersoft/Germany-Used-Car-Analysis/final.csv', encoding='utf-8')  
 cdata_electric = df3.loc[df3['fuel_type'] == 'Electric'].copy()
 cdata_electric.rename(columns={'fuel_consumption_l_100km':'charge_time_100km'},inplace=True)
 cdata_electric.reset_index(drop=True,inplace=True)

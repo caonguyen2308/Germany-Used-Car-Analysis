@@ -3,7 +3,7 @@ import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
 
-df3 = pd.read_csv('D:/Cybersoft/Germany-Used-Car-Analysis/brandcode_final.csv', encoding='utf-8')
+df3 = pd.read_csv('D:/Cybersoft/Germany-Used-Car-Analysis/final.csv', encoding='utf-8')
 
 mean_power_ps_brand = df3.groupby('brand')['power_ps'].mean().reset_index()
 mean_power_ps_brand.sort_values('power_ps',ascending=False,inplace=True)

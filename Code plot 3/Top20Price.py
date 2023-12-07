@@ -3,7 +3,7 @@ import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
 
-df3 = pd.read_csv('D:/Cybersoft/Germany-Used-Car-Analysis/brandcode_final.csv', encoding='utf-8')
+df3 = pd.read_csv('D:/Cybersoft/Germany-Used-Car-Analysis/final.csv', encoding='utf-8')
 
 mean_price_brand = df3.groupby('brand')['price_in_euro'].mean().reset_index()
 mean_price_brand.sort_values('price_in_euro',ascending=False,inplace=True)

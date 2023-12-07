@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 np.set_printoptions(suppress=True, precision=True)
 
-df3 = cdata = pd.read_csv('D:/Cybersoft/Germany-Used-Car-Analysis/brandcode_final.csv', encoding='utf-8')
+df3 = cdata = pd.read_csv('D:/Cybersoft/Germany-Used-Car-Analysis/final.csv', encoding='utf-8')
 cdata_normal_fuel = cdata.loc[cdata['fuel_type'] != 'Electric'].copy()
 fig, ax =plt.subplots(figsize=(10,7),num=1)
 ax.hist(cdata_normal_fuel['fuel_consumption_l_100km'], bins = 100, color='r',edgecolor='black')

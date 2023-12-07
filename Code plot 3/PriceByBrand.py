@@ -3,7 +3,7 @@ import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
 
-cdata = pd.read_csv('D:/Cybersoft/Germany-Used-Car-Analysis/brandcode_final.csv', encoding='utf-8')
+cdata = pd.read_csv('D:/Cybersoft/Germany-Used-Car-Analysis/final.csv', encoding='utf-8')
 cdata_normal_fuel = cdata[cdata['fuel_type']!='electric']
 cdata_normal_fuel['price_in_euro'].describe()
 cdata_normal_fuel['fuel_consumption_l_100km'].describe()

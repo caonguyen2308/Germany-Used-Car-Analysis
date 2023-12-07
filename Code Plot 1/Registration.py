@@ -3,9 +3,7 @@ import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
 
-df3 = pd.read_csv('D:/Cybersoft/Germany-Used-Car-Analysis/brandcode_final.csv', encoding='utf-8')
-df3['registration_date'] = pd.to_datetime(df3['registration_date'], format='%m/%d/%Y %H:%M', errors='coerce')
-df3['year'] = df3['registration_date'].dt.year
+df3 = pd.read_csv('D:/Cybersoft/Germany-Used-Car-Analysis/final.csv', encoding='utf-8')
 # Count the number of registrations for each year
 registrations_by_year = df3['year'].value_counts().sort_index()
 # Plot the count of registrations per year as a line chart
