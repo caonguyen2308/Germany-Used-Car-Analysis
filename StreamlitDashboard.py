@@ -371,7 +371,6 @@ elif selected_plot == 'Consumption':
             ax6.axvline(5.25, color='violet',linestyle='--',linewidth=2)
             ax6.text(5.35-4,13000,f"Mode:\n{5.25:0.2f}",color='violet')
             ax6.set_xlabel("Fuel consumption (litter/100km)")
-            plt.title("General information of Fuel Consumption",fontweight='bold')
             plt.grid()
             st.pyplot(fig6)
             
